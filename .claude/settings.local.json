@@ -5,7 +5,10 @@
       "Bash(npm install *)",
       "Bash(git add *)",
       "Bash(git commit *)",
-      "Bash(timeout 5 npm start)"
+      "Bash(timeout 5 npm start)",
+      "Bash(node -e ' *)",
+      "WebFetch(domain:www.api-football.com)",
+      "WebSearch"
     ]
   }
 }

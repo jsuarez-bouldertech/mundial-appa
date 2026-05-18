@@ -67,4 +67,28 @@ export class StateManager {
     this.state[fixtureId].notifications.push(eventType);
     this._saveState();
   }
+
+  hasLineupBeenNotified(fixtureId) {
+    return this.state[fixtureId]?.lineupNotified || false;
+  }
+
+  markLineupNotified(fixtureId) {
+    if (!this.state[fixtureId]) {
+      this.state[fixtureId] = {};
+    }
+    this.state[fixtureId].lineupNotified = true;
+    this._saveState();
+  }
+
+  hasPreMatchBeenNotified(fixtureId) {
+    return this.state[fixtureId]?.preMatchNotified || false;
+  }
+
+  markPreMatchNotified(fixtureId) {
+    if (!this.state[fixtureId]) {
+      this.state[fixtureId] = {};
+    }
+    this.state[fixtureId].preMatchNotified = true;
+    this._saveState();
+  }
 }

@@ -45,4 +45,23 @@ export class APIFootball {
       return null;
     }
   }
+
+  async getLineups(fixtureId) {
+    try {
+      const response = await this.client.get('/fixtures/lineups', {
+        params: { fixture: fixtureId }
+      });
+
+      return response.data.response || [];
+    } catch (error) {
+      console.error(`❌ Error fetching lineups ${fixtureId}:`, error.message);
+      return [];
+    }
+  }
+
+  getMinutesUntilMatch(matchDate) {
+    const now = new Date();
+    const match = new Date(matchDate);
+    return Math.floor((match - now) / 1000 / 60);
+  }
 }

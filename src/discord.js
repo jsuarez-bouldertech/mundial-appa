@@ -96,6 +96,103 @@ export class DiscordNotifier {
     return goals;
   }
 
+  async notifyMatchIn15Minutes(match) {
+    const { teams, fixture, league } = match;
+
+    const homeTeam = teams.home;
+    const awayTeam = teams.away;
+    const stadium = fixture.venue?.name || 'TBD';
+    const city = fixture.venue?.city || '';
+    const matchTime = new Date(fixture.date).toLocaleString('es-ES');
+    const referee = match.fixture.referee || 'TBD';
+
+    const embed = {
+      title: '⏰ COMIENZA EN 15 MINUTOS',
+      color: 16766464,
+      fields: [
+        {
+          name: `${homeTeam.name} 🆚 ${awayTeam.name}`,
+          value: `🏆 FIFA World Cup ${process.env.WORLD_CUP_SEASON}`,
+          inline: false
+        },
+        {
+          name: '🕒 Hora',
+          value: matchTime,
+          inline: true
+        },
+        {
+          name: '📍 Estadio',
+          value: `${stadium}${city ? ` - ${city}` : ''}`,
+          inline: true
+        },
+        {
+          name: '🏆 Árbitro',
+          value: referee,
+          inline: false
+        }
+      ],
+      thumbnail: {
+        url: league.logo
+      },
+      timestamp: new Date().toISOString()
+    };
+
+    return this._send({ embeds: [embed] });
+  }
+
+  async notifyLineups(match, lineups) {
+    const { teams, fixture, league } = match;
+
+    const homeTeam = teams.home;
+    const awayTeam = teams.away;
+
+    const homeLineup = lineups.find(l => l.team.id === homeTeam.id);
+    const awayLineup = lineups.find(l => l.team.id === awayTeam.id);
+
+    const formatLineup = (lineup) => {
+      if (!lineup) return 'No disponible';
+
+      const formation = lineup.formation || 'TBD';
+      const coach = lineup.coach?.name || 'TBD';
+
+      let players = '';
+      if (lineup.startXI && lineup.startXI.length > 0) {
+        const playerNames = lineup.startXI.map(p => p.player.name).slice(0, 5).join(', ');
+        players = `XI: ${playerNames}...`;
+      }
+
+      return `**Formación: ${formation}**\nDT: ${coach}\n${players}`;
+    };
+
+    const embed = {
+      title: '📋 ALINEACIONES CONFIRMADAS',
+      color: 16776960,
+      fields: [
+        {
+          name: `🇦🇷 ${homeTeam.name}`,
+          value: formatLineup(homeLineup),
+          inline: true
+        },
+        {
+          name: `🇧🇷 ${awayTeam.name}`,
+          value: formatLineup(awayLineup),
+          inline: true
+        },
+        {
+          name: '⚽ Próximo estado',
+          value: 'El partido comenzará en breve',
+          inline: false
+        }
+      ],
+      thumbnail: {
+        url: league.logo
+      },
+      timestamp: new Date().toISOString()
+    };
+
+    return this._send({ embeds: [embed] });
+  }
+
   async _send(payload) {
     try {
       await axios.post(this.webhookUrl, payload);

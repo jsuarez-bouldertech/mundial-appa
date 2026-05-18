@@ -27,6 +27,28 @@ async function checkMatches() {
     const fixtureId = match.fixture.id;
     const status = match.fixture.status.short;
     const previousStatus = state.getMatchStatus(fixtureId);
+    const minutesUntilMatch = api.getMinutesUntilMatch(match.fixture.date);
+
+    // Pre-match notification: 15 minutes before (between 20-15 min before)
+    if (status === 'NS' && minutesUntilMatch > 0 && minutesUntilMatch <= 20) {
+      if (!state.hasPreMatchBeenNotified(fixtureId)) {
+        console.log(`⏰ Pre-match: ${match.teams.home.name} vs ${match.teams.away.name}`);
+        await notifier.notifyMatchIn15Minutes(match);
+        state.markPreMatchNotified(fixtureId);
+      }
+    }
+
+    // Lineups notification: when available (20-40 min before)
+    if (status === 'NS' && minutesUntilMatch > 0 && minutesUntilMatch <= 40) {
+      if (!state.hasLineupBeenNotified(fixtureId)) {
+        const lineups = await api.getLineups(fixtureId);
+        if (lineups.length > 0) {
+          console.log(`📋 Lineups available: ${match.teams.home.name} vs ${match.teams.away.name}`);
+          await notifier.notifyLineups(match, lineups);
+          state.markLineupNotified(fixtureId);
+        }
+      }
+    }
 
     // Match started: NS -> LIVE
     if (previousStatus !== 'LIVE' && status === 'LIVE') {
