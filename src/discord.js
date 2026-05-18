@@ -19,17 +19,17 @@ export class DiscordNotifier {
       fields: [
         {
           name: `🇦🇷 ${homeTeam.name}`,
-          value: `[Escudo](${homeTeam.logo})`,
+          value: `EN VIVO`,
           inline: true
         },
         {
-          name: `🆚 EN VIVO 🆚`,
+          name: `​`,
           value: `​`,
           inline: true
         },
         {
           name: `${awayTeam.name} 🇧🇷`,
-          value: `[Escudo](${awayTeam.logo})`,
+          value: `​`,
           inline: true
         },
         {
@@ -48,12 +48,6 @@ export class DiscordNotifier {
           inline: true
         }
       ],
-      thumbnail: {
-        url: homeTeam.logo
-      },
-      image: {
-        url: league.logo
-      },
       timestamp: new Date().toISOString()
     };
 
@@ -79,7 +73,7 @@ export class DiscordNotifier {
       fields: [
         {
           name: `🇦🇷 ${homeTeam.name}`,
-          value: `[Escudo](${homeTeam.logo})\n**${homeGoals} GOLES**`,
+          value: `**${homeGoals}** GOLES`,
           inline: true
         },
         {
@@ -89,7 +83,7 @@ export class DiscordNotifier {
         },
         {
           name: `${awayTeam.name} 🇧🇷`,
-          value: `[Escudo](${awayTeam.logo})\n**${awayGoals} GOLES**`,
+          value: `**${awayGoals}** GOLES`,
           inline: true
         },
         {
@@ -103,12 +97,6 @@ export class DiscordNotifier {
           inline: false
         }
       ],
-      thumbnail: {
-        url: homeTeam.logo
-      },
-      image: {
-        url: league.logo
-      },
       timestamp: new Date().toISOString()
     };
 
@@ -148,17 +136,17 @@ export class DiscordNotifier {
       fields: [
         {
           name: `🇦🇷 ${homeTeam.name}`,
-          value: `[Escudo](${homeTeam.logo})`,
+          value: `VS`,
           inline: true
         },
         {
-          name: `🆚 VS 🆚`,
+          name: `​`,
           value: `​`,
           inline: true
         },
         {
           name: `${awayTeam.name} 🇧🇷`,
-          value: `[Escudo](${awayTeam.logo})`,
+          value: `​`,
           inline: true
         },
         {
@@ -182,12 +170,6 @@ export class DiscordNotifier {
           inline: false
         }
       ],
-      thumbnail: {
-        url: homeTeam.logo
-      },
-      image: {
-        url: league.logo
-      },
       timestamp: new Date().toISOString()
     };
 
@@ -203,7 +185,7 @@ export class DiscordNotifier {
     const homeLineup = lineups.find(l => l.team.id === homeTeam.id);
     const awayLineup = lineups.find(l => l.team.id === awayTeam.id);
 
-    const formatLineup = (team, lineup) => {
+    const formatLineup = (lineup) => {
       if (!lineup) return 'No disponible';
 
       const formation = lineup.formation || 'TBD';
@@ -215,7 +197,7 @@ export class DiscordNotifier {
         players = `XI: ${playerNames}...`;
       }
 
-      return `[${team.logo}](${team.logo})\n**Formación: ${formation}**\nDT: ${coach}\n${players}`;
+      return `**Formación: ${formation}**\nDT: ${coach}\n${players}`;
     };
 
     const embed = {
@@ -224,12 +206,12 @@ export class DiscordNotifier {
       fields: [
         {
           name: `🇦🇷 ${homeTeam.name}`,
-          value: formatLineup(homeTeam, homeLineup),
+          value: formatLineup(homeLineup),
           inline: true
         },
         {
           name: `🇧🇷 ${awayTeam.name}`,
-          value: formatLineup(awayTeam, awayLineup),
+          value: formatLineup(awayLineup),
           inline: true
         },
         {
@@ -238,9 +220,6 @@ export class DiscordNotifier {
           inline: false
         }
       ],
-      thumbnail: {
-        url: league.logo
-      },
       timestamp: new Date().toISOString()
     };
 

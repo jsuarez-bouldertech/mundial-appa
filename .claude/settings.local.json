@@ -8,7 +8,8 @@
       "Bash(timeout 5 npm start)",
       "Bash(node -e ' *)",
       "WebFetch(domain:www.api-football.com)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(npm run *)"
     ]
   }
 }
