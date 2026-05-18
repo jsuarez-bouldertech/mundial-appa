@@ -14,12 +14,27 @@ export class DiscordNotifier {
     const matchTime = new Date(fixture.date).toLocaleString('es-ES');
 
     const embed = {
-      title: '⚽ Comenzó el partido',
+      title: '⚽ COMENZÓ EL PARTIDO',
       color: 3066993,
       fields: [
         {
-          name: `${homeTeam.name} vs ${awayTeam.name}`,
-          value: `🏆 FIFA World Cup ${process.env.WORLD_CUP_SEASON}`,
+          name: `🇦🇷 ${homeTeam.name}`,
+          value: `[Escudo](${homeTeam.logo})`,
+          inline: true
+        },
+        {
+          name: `🆚 EN VIVO 🆚`,
+          value: `​`,
+          inline: true
+        },
+        {
+          name: `${awayTeam.name} 🇧🇷`,
+          value: `[Escudo](${awayTeam.logo})`,
+          inline: true
+        },
+        {
+          name: '🏆 Torneo',
+          value: `FIFA World Cup ${process.env.WORLD_CUP_SEASON}`,
           inline: false
         },
         {
@@ -34,6 +49,9 @@ export class DiscordNotifier {
         }
       ],
       thumbnail: {
+        url: homeTeam.logo
+      },
+      image: {
         url: league.logo
       },
       timestamp: new Date().toISOString()
@@ -56,21 +74,39 @@ export class DiscordNotifier {
       : '';
 
     const embed = {
-      title: '🏁 Final del partido',
+      title: '🏁 FINAL DEL PARTIDO',
       color: 16776960,
       fields: [
         {
-          name: `${homeTeam.name} ${homeGoals} - ${awayGoals} ${awayTeam.name}`,
-          value: `🏆 FIFA World Cup ${process.env.WORLD_CUP_SEASON}`,
+          name: `🇦🇷 ${homeTeam.name}`,
+          value: `[Escudo](${homeTeam.logo})\n**${homeGoals} GOLES**`,
+          inline: true
+        },
+        {
+          name: `RESULTADO`,
+          value: `**${homeGoals} - ${awayGoals}**`,
+          inline: true
+        },
+        {
+          name: `${awayTeam.name} 🇧🇷`,
+          value: `[Escudo](${awayTeam.logo})\n**${awayGoals} GOLES**`,
+          inline: true
+        },
+        {
+          name: '🏆 Torneo',
+          value: `FIFA World Cup ${process.env.WORLD_CUP_SEASON}`,
           inline: false
         },
         {
-          name: 'Resultado',
+          name: 'Goles',
           value: goalsDescription || 'Sin goles registrados',
           inline: false
         }
       ],
       thumbnail: {
+        url: homeTeam.logo
+      },
+      image: {
         url: league.logo
       },
       timestamp: new Date().toISOString()
@@ -111,8 +147,23 @@ export class DiscordNotifier {
       color: 16766464,
       fields: [
         {
-          name: `${homeTeam.name} 🆚 ${awayTeam.name}`,
-          value: `🏆 FIFA World Cup ${process.env.WORLD_CUP_SEASON}`,
+          name: `🇦🇷 ${homeTeam.name}`,
+          value: `[Escudo](${homeTeam.logo})`,
+          inline: true
+        },
+        {
+          name: `🆚 VS 🆚`,
+          value: `​`,
+          inline: true
+        },
+        {
+          name: `${awayTeam.name} 🇧🇷`,
+          value: `[Escudo](${awayTeam.logo})`,
+          inline: true
+        },
+        {
+          name: '🏆 Torneo',
+          value: `FIFA World Cup ${process.env.WORLD_CUP_SEASON}`,
           inline: false
         },
         {
@@ -132,6 +183,9 @@ export class DiscordNotifier {
         }
       ],
       thumbnail: {
+        url: homeTeam.logo
+      },
+      image: {
         url: league.logo
       },
       timestamp: new Date().toISOString()
@@ -149,7 +203,7 @@ export class DiscordNotifier {
     const homeLineup = lineups.find(l => l.team.id === homeTeam.id);
     const awayLineup = lineups.find(l => l.team.id === awayTeam.id);
 
-    const formatLineup = (lineup) => {
+    const formatLineup = (team, lineup) => {
       if (!lineup) return 'No disponible';
 
       const formation = lineup.formation || 'TBD';
@@ -161,7 +215,7 @@ export class DiscordNotifier {
         players = `XI: ${playerNames}...`;
       }
 
-      return `**Formación: ${formation}**\nDT: ${coach}\n${players}`;
+      return `[${team.logo}](${team.logo})\n**Formación: ${formation}**\nDT: ${coach}\n${players}`;
     };
 
     const embed = {
@@ -170,17 +224,17 @@ export class DiscordNotifier {
       fields: [
         {
           name: `🇦🇷 ${homeTeam.name}`,
-          value: formatLineup(homeLineup),
+          value: formatLineup(homeTeam, homeLineup),
           inline: true
         },
         {
           name: `🇧🇷 ${awayTeam.name}`,
-          value: formatLineup(awayLineup),
+          value: formatLineup(awayTeam, awayLineup),
           inline: true
         },
         {
-          name: '⚽ Próximo estado',
-          value: 'El partido comenzará en breve',
+          name: '⚽ El partido comenzará en breve',
+          value: `${homeTeam.name} vs ${awayTeam.name}`,
           inline: false
         }
       ],

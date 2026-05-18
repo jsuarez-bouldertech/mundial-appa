@@ -22,20 +22,23 @@ async function checkMatches() {
   }
 
   let liveCount = 0;
+  let nearbyMatches = 0;
 
   for (const match of matches) {
     const fixtureId = match.fixture.id;
     const status = match.fixture.status.short;
     const previousStatus = state.getMatchStatus(fixtureId);
     const minutesUntilMatch = api.getMinutesUntilMatch(match.fixture.date);
+    const matchStartWindow = parseInt(process.env.MATCH_START_WINDOW);
 
-    // Pre-match notification: 15 minutes before (between 20-15 min before)
+    // Pre-match notification: 15-20 minutes before
     if (status === 'NS' && minutesUntilMatch > 0 && minutesUntilMatch <= 20) {
       if (!state.hasPreMatchBeenNotified(fixtureId)) {
         console.log(`⏰ Pre-match: ${match.teams.home.name} vs ${match.teams.away.name}`);
         await notifier.notifyMatchIn15Minutes(match);
         state.markPreMatchNotified(fixtureId);
       }
+      nearbyMatches++;
     }
 
     // Lineups notification: when available (20-40 min before)
@@ -48,6 +51,7 @@ async function checkMatches() {
           state.markLineupNotified(fixtureId);
         }
       }
+      nearbyMatches++;
     }
 
     // Match started: NS -> LIVE
@@ -59,15 +63,12 @@ async function checkMatches() {
       }
     }
 
-    // Match ended: LIVE -> FT/AET/PEN
+    // Match ended: LIVE -> FT/AET/PEN (use cached match data from getTodayMatches)
     if (previousStatus === 'LIVE' && ['FT', 'AET', 'PEN'].includes(status)) {
       if (!state.hasNotified(fixtureId, 'END')) {
-        const fullMatch = await api.getMatch(fixtureId);
-        if (fullMatch) {
-          console.log(`✅ Match ended: ${fullMatch.teams.home.name} vs ${fullMatch.teams.away.name}`);
-          await notifier.notifyMatchEnd(fullMatch);
-          state.markNotified(fixtureId, 'END');
-        }
+        console.log(`✅ Match ended: ${match.teams.home.name} vs ${match.teams.away.name}`);
+        await notifier.notifyMatchEnd(match);
+        state.markNotified(fixtureId, 'END');
       }
     }
 
@@ -79,22 +80,24 @@ async function checkMatches() {
     }
   }
 
-  // Adjust polling based on live matches
-  const newHasLiveMatches = liveCount > 0;
+  // Smart polling: increase frequency when matches are nearby
+  const shouldIncreasePoll = nearbyMatches > 0 || liveCount > 0;
+  const newHasLiveMatches = liveCount > 0 || nearbyMatches > 0;
+
   if (newHasLiveMatches !== hasLiveMatches) {
     hasLiveMatches = newHasLiveMatches;
-    const newInterval = hasLiveMatches
+    const newInterval = shouldIncreasePoll
       ? parseInt(process.env.POLLING_INTERVAL_LIVE)
       : parseInt(process.env.POLLING_INTERVAL_NORMAL);
 
     if (newInterval !== pollingInterval) {
       pollingInterval = newInterval;
       const minutes = Math.round(pollingInterval / 1000 / 60);
-      console.log(`📊 Live matches detected. Polling every ${minutes} minutes`);
+      console.log(`📊 Polling interval: every ${minutes} min (${shouldIncreasePoll ? 'match nearby' : 'normal mode'})`);
     }
   }
 
-  console.log(`📊 Status: ${matches.length} matches, ${liveCount} live`);
+  console.log(`📊 Status: ${matches.length} total, ${liveCount} live, ${nearbyMatches} nearby`);
 }
 
 async function start() {
