@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\jsuar\\\\Documents\\\\GitHub\\\\mundial-appa\" -Exclude node_modules | Format-Table Name, @{Name=\"Type\"; Expression={if \\($_.PSIsContainer\\) { \"📁\" } else { \"📄\" }}} -AutoSize)"
+    ]
+  }
+}

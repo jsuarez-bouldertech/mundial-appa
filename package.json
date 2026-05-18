@@ -1,0 +1,19 @@
+{
+  "name": "world-cup-notifier",
+  "version": "1.0.0",
+  "description": "Minimal Discord notifier for FIFA World Cup 2026 matches",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "test": "node src/test.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "dotenv": "^16.3.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
